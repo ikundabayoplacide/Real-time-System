@@ -1,6 +1,5 @@
 import axios from "axios";
 const upload_Url = "http://localhost:8000/api/upload/";
-const imageResults_Url="http://localhost:8000/api/image-results/";
 const allPredictions_Url="http://localhost:8000/api/predictions/";
 export const uploadImage = async (formData) => {
     try {
@@ -19,21 +18,6 @@ export const uploadImage = async (formData) => {
         throw error;
     }
 }
-export const imageResults=async () => {
-    try {
-
-        const response=await axios.get(imageResults_Url, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
-        console.log("Fetched image results uploaded successfully:", imagesResultData.data);
-        return response.data;
-    } catch (error) {    
-        console.error("Error uploading image:", error);
-        throw error;
-    }
-};
 
 export const getAllPredictions=async () => {
     try {

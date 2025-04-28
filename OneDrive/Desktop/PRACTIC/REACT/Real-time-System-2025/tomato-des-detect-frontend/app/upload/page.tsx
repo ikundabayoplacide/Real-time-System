@@ -7,15 +7,15 @@ import DashboardLayout from '../dashboard/page';
 import FileUpload from '@/components/file-upload';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { imageResults, uploadImage } from '@/redux-fetch-endpoints/upload';
+import { uploadImage } from '@/redux-fetch-endpoints/upload';
 
 export default function UploadPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [showUploadArea, setShowUploadArea] = useState(true);
+  const [uploadResult, setUploadResult] = useState(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [predictions, setPredictions] = useState<string[]>([]); 
 
   // Handle files selected from FileUpload component
   const handleFilesSelected = (files: FileList) => {
@@ -91,8 +91,10 @@ export default function UploadPage() {
         formData.append('image', file);
       });
       const result = await uploadImage(formData);
+      setUploadResult(result);
       alert("Image uploaded successfully");
       console.log(result);
+     
     }
     catch(error){
       alert("Error uploading image: " + error);
@@ -102,15 +104,7 @@ export default function UploadPage() {
     }
   }
 // Function to fetch image results
-const fetchImageResults = async () => {
-  try {
-    const result= await imageResults();
-    setPredictions(result);
-  }
-  catch(error){
-    alert("Error fetching image results: " + error);
-  }
-};
+
 
 
   return (
@@ -226,41 +220,38 @@ const fetchImageResults = async () => {
           <h2 className="text-xl font-bold">Uploaded Results</h2>
           <Button 
             variant="outline" 
-            onClick={fetchImageResults}
             className="text-sm"
+            onClick={()=>setUploadResult(null)}
           >
-            Refresh Results
+            Clear Results
           </Button>
         </div>
-        {predictions.length > 0 ? (
+        { uploadResult ? (
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-gray-700">
               <tr className="border-b border-gray-300">
-                <th className="font-semibold px-3 py-2">Image ID</th>
+                <th className="font-semibold px-3 py-2">Image No</th>
                 <th className="font-semibold px-3 py-2">Predictions</th>
                 <th className="font-semibold px-3 py-2">Confidence</th>
-                <th className="font-semibold px-3 py-2">Date</th>
               </tr>
             </thead>
             <tbody>
-              {predictions.map((result) => (
-                <tr key={result.image_id} className="border-b border-gray-200 hover:bg-gray-100">
-                  <td className="px-3 py-2">{result.image_id}</td>
-                  <td className="px-3 py-2">{result.prediction}</td>
+                <tr  className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="px-3 py-2">{uploadResult.image_id}</td>
+                  <td className="px-3 py-2">{uploadResult.prediction}</td>
                   <td className="px-3 py-2">
                     <div className="flex items-center">
                       <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
                         <div 
                           className="bg-teal-500 h-2.5 rounded-full" 
-                          style={{ width: `${result.confidence * 100}%` }}
+                          style={{ width: `${uploadResult.confidence * 100}%` }}
                         ></div>
                       </div>
-                      <span>{(result.confidence * 100).toFixed(0)}%</span>
+                      <span>{(uploadResult.confidence * 100).toFixed(0)}%</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2">{new Date(result.created_at).toLocaleDateString()}</td>
                 </tr>
-              ))}
+            
             </tbody>
           </table>
         ) : (

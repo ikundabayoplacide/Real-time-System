@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, Download, Loader, Share } from "lucide-react";
 import DashboardLayout from '../dashboard/page';
 import { getAllPredictions } from '@/redux-fetch-endpoints/upload';
+import Image from 'next/image';
 export default function AnalysisResultsPage() {
 
   const [resultData,setResultData]=useState([]);
@@ -187,7 +188,8 @@ export default function AnalysisResultsPage() {
               <thead>
                 <tr className="text-left text-gray-700">
                 
-                  <th className="pb-2">Image ID</th>
+                  <th className="pb-2">Image No</th>
+                  <th className='pb-2'>Image view</th>
                   <th className="pb-2">Generated Date</th>
                   <th className="pb-2">Result</th>
                   <th className="pb-2">Confidence</th>
@@ -199,6 +201,18 @@ export default function AnalysisResultsPage() {
                   <tr key={index} className="border-t border-gray-200">
                    
                     <td>{item.id}</td>
+                    <td className="px-3 py-2">
+                   {item.image && (
+                  <div className="w-16 h-16 rounded overflow-hidden">
+                   <Image 
+                  src={`http://localhost:8000${item.image}`} 
+                  alt="Uploaded leaf" 
+                  className="w-full h-full object-cover"
+                  width={20} height={20}
+                   />
+                  </div>
+                    )}
+                   </td>
                     <td className="py-3">{formatDate(item.created_at)}</td>
                     <td>
                           <span className={`px-3 py-1 rounded-full text-xs ${
