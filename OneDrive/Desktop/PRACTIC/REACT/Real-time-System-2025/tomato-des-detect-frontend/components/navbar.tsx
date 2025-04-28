@@ -27,11 +27,11 @@ export default function Navbar() {
           <a href="#" className="text-gray-700 hover:text-gray-900 ">
             About
           </a>
-          <a href="/src/contact" className="text-gray-700 hover:text-gray-900">
+          <a href="/contact" className="text-gray-700 hover:text-gray-900">
             Contact
           </a>
         </div>
-       <Link href="/src/auth/login">
+       <Link href="/login">
         <Button className="bg-red-600 hover:bg-red-700 text-white">
           Login
         </Button>

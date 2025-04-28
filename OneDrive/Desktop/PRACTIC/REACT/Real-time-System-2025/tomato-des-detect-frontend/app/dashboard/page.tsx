@@ -1,16 +1,19 @@
-/* eslint-disable @next/next/no-img-element */
+"use client"
 import Link from 'next/link';
 import { LayoutDashboard, History, FileText, Settings, Plus, Cpu, Search } from "lucide-react";
+import Image from 'next/image';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 
-export default function DashboardLayout({
-  children,
-  activePage = 'dashboard',
-
-}: {
-  children: React.ReactNode;
-  activePage?: string;
-}) {
+export default function DashboardLayout({children,activePage = 'dashboard',}: {children: React.ReactNode;activePage?: string;}) {
+  const [dropdown,setDropdown]=useState(false);
+  const router=useRouter()
+  const handleLogout=()=>{
+    alert("Logging out ...");
+    router.push('/login');
+    
+  }
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -32,9 +35,20 @@ export default function DashboardLayout({
           />
         <Search className="w-6 h-6 text-gray-600" />
         </div>
-        <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center">
-          <img src="/passport.jpg" alt=" avatar" className="w-full h-full border border-gray-200  rounded-full" />
+        <div className='relative'>
+        <div className="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center" onClick={()=>setDropdown(!dropdown)}>
+          <Image src="/passport.jpg" alt=" avatar" width={60} height={40} className=" w-full h-full border border-gray-200  rounded-full"/>
         </div>
+        { dropdown &&(
+          <div className="absolute right-0 mt-1 w-28 rounded-md shadow-lg">
+               <button
+                onClick={handleLogout}
+                className="block w-full text-center py-1 rounded-md bg-red-400 hover:bg-red-600  text-white "
+              >
+                Logout
+              </button>
+          </div>
+        )}</div>
       </header>
 
       {/* Main Content with Sidebar */}
@@ -42,23 +56,23 @@ export default function DashboardLayout({
         {/* Sidebar Navigation */}
         <aside className="w-64 min-h-screen border-r border-gray-200 p-4">
         <nav className="space-y-2 sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-hidden">
-            <Link href="/src/dashboard" 
+            <Link href="/dashboard" 
               className={`flex items-center p-4 rounded-lg ${activePage === 'dashboard' ? 'bg-red-50 text-red-500' : 'text-gray-600 hover:bg-gray-100'}`}>
               <LayoutDashboard className="w-5 h-5 mr-3" />
               <span>Dashboard</span>
             </Link>
             
-            <Link href="/src/upload" 
+            <Link href="/upload" 
               className={`flex items-center p-4 rounded-lg ${activePage === 'upload' ? 'bg-red-50 text-red-500' : 'text-gray-600 hover:bg-gray-100'}`}>
               <Plus className="w-5 h-5 mr-3" />
               <span>Upload Images</span>
             </Link>
-            <Link href="/src/imageprocessing" 
+            <Link href="/imageprocessing" 
               className={`flex items-center p-4 rounded-lg ${activePage === 'imageProcessing' ? 'bg-red-50 text-red-500' : 'text-gray-600 hover:bg-gray-100'}`}>
              <Cpu className="w-5 h-5 mr-3" />
               <span>Image Processing</span>
             </Link>
-            <Link href="/src/result" 
+            <Link href="/result" 
               className={`flex items-center p-4 rounded-lg ${activePage === 'results' ? 'bg-red-50 text-red-500' : 'text-gray-600 hover:bg-gray-100'}`}>
               <History className="w-5 h-5 mr-3" />
               <span>Analysis Results</span>

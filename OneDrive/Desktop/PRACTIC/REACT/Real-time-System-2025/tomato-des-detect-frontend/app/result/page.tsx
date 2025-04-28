@@ -1,13 +1,18 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Download, Share } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Loader, Share } from "lucide-react";
 import DashboardLayout from '../dashboard/page';
-
+import { getAllPredictions } from '@/redux-fetch-endpoints/upload';
 export default function AnalysisResultsPage() {
+
+  const [resultData,setResultData]=useState([]);
+  const [loading,seLoading]=useState(true);
+  const [error,setError]=useState(null);
+
   // Disease data
   const diseaseData = {
     imageName: "IMG_4532",
@@ -28,25 +33,31 @@ export default function AnalysisResultsPage() {
     ]
   };
 
-  // Analysis history data
-  const historyData = [
-    {
-      date: "Mar 01, 2025",
-      imageId: "IMG_4498",
-      result: "Healthy",
-      severity: "-",
-      location: "North Field",
-      action: "View"
-    },
-    {
-      date: "Mar 28, 2025",
-      imageId: "IMG_4426",
-      result: "Leaf Spot",
-      severity: "Medium",
-      location: "South Field",
-      action: "View"
-    }
-  ];
+
+  useEffect(() => {
+    const fetchallPredictions=async()=>{
+      try {
+        seLoading(true);
+        const data = await getAllPredictions();
+        setResultData(data);
+        seLoading(false);
+      }
+      catch (error) {
+        console.error('Error fetching data:', error);
+        setError("Failed to load predictions. Please try again later");
+        setLoading(false);
+      }}
+      fetchallPredictions();
+    }, []);
+
+    const formatDate = (dateString: any) => {
+      const options: Intl.DateTimeFormatOptions = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      };
+      return new Date(dateString).toLocaleDateString('en-US', options);
+    };
 
   return (
     <DashboardLayout activePage="results">
@@ -163,42 +174,56 @@ export default function AnalysisResultsPage() {
           {/* History Table */}
           <div className="mt-8 bg-white p-6 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Recent Analysis History</h2>
+            {
+              loading?(
+                <div className='flex justify-center '>
+                <Loader  />
+                </div>
+              ):error?(
+                <p className='text-red-500'>{error}</p>
+              ):
+            resultData.length>0 ?(
             <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-700">
-                  <th className="pb-2">Date</th>
+                
                   <th className="pb-2">Image ID</th>
+                  <th className="pb-2">Generated Date</th>
                   <th className="pb-2">Result</th>
-                  <th className="pb-2">Severity</th>
-                  <th className="pb-2">Location</th>
-                  <th className="pb-2">Action</th>
+                  <th className="pb-2">Confidence</th>
+                  <th className='pb-2'> Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {historyData.map((item, index) => (
+                {resultData.map((item, index) => (
                   <tr key={index} className="border-t border-gray-200">
-                    <td className="py-3">{item.date}</td>
-                    <td>{item.imageId}</td>
+                   
+                    <td>{item.id}</td>
+                    <td className="py-3">{formatDate(item.created_at)}</td>
                     <td>
-                      <span className={`px-3 py-1 rounded-full text-xs ${
-                        item.result === "Healthy" 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-orange-100 text-orange-800"
-                      }`}>
-                        {item.result}
-                      </span>
-                    </td>
-                    <td>{item.severity}</td>
-                    <td>{item.location}</td>
+                          <span className={`px-3 py-1 rounded-full text-xs ${
+                            item.class_name === "Healthy" 
+                              ? "bg-green-100 text-green-800" 
+                              : "bg-orange-100 text-orange-800"
+                          }`}>
+                            {item.class_name}
+                          </span>
+                        </td>
+                    <td>{item.confidence}%</td>
+                    
+                    
                     <td>
                       <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white text-xs py-1">
-                        {item.action}
+                        View
                       </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            ):(
+            <p className='text-gray-600 text-xl'> There are no Predictions in the System!</p>
+            )}
           </div>
         </div>
       </div>

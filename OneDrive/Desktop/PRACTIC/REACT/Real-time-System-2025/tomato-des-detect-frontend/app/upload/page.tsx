@@ -7,7 +7,7 @@ import DashboardLayout from '../dashboard/page';
 import FileUpload from '@/components/file-upload';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { uploadImage } from '@/redux-fetch-endpoints/upload';
+import { imageResults, uploadImage } from '@/redux-fetch-endpoints/upload';
 
 export default function UploadPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -15,6 +15,7 @@ export default function UploadPage() {
   const [showUploadArea, setShowUploadArea] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [predictions, setPredictions] = useState<string[]>([]); 
 
   // Handle files selected from FileUpload component
   const handleFilesSelected = (files: FileList) => {
@@ -100,6 +101,17 @@ export default function UploadPage() {
       setIsLoading(false);
     }
   }
+// Function to fetch image results
+const fetchImageResults = async () => {
+  try {
+    const result= await imageResults();
+    setPredictions(result);
+  }
+  catch(error){
+    alert("Error fetching image results: " + error);
+  }
+};
+
 
   return (
     <DashboardLayout activePage="upload">
@@ -196,7 +208,7 @@ export default function UploadPage() {
             <p className="text-gray-600 text-sm mb-4">
               Use this option to upload multiple images at once
             </p>
-            <Link href='/src/image.processing'>
+            <Link href='/image.processing'>
               <Button 
                 variant="outline" 
                 className="w-full bg-orange-100 border-orange-200 text-orange-500 hover:bg-orange-200"
@@ -210,21 +222,52 @@ export default function UploadPage() {
 
       {/* Tips Section */}
       <div className="mt-4 bg-[#f4f4f4] px-5 border border-gray-300 rounded-lg py-3">
-        <h2 className="text-xl font-bold mb-4">Tips for Better Analysis</h2>
-        <ul className="space-y-3">
-          <li className="flex items-start">
-            <div className="w-2 h-2 mt-2 mr-3 rounded-full bg-teal-500"></div>
-            <span className="text-gray-600">Ensure good lighting when taking photos</span>
-          </li>
-          <li className="flex items-start">
-            <div className="w-2 h-2 mt-2 mr-3 rounded-full bg-teal-500"></div>
-            <span className="text-gray-600">Focus on affected areas of the leaf</span>
-          </li>
-          <li className="flex items-start">
-            <div className="w-2 h-2 mt-2 mr-3 rounded-full bg-teal-500"></div>
-            <span className="text-gray-600">Include both healthy and potentially diseased leaves for comparison</span>
-          </li>
-        </ul>
+      <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Uploaded Results</h2>
+          <Button 
+            variant="outline" 
+            onClick={fetchImageResults}
+            className="text-sm"
+          >
+            Refresh Results
+          </Button>
+        </div>
+        {predictions.length > 0 ? (
+          <table className="w-full text-left">
+            <thead className="bg-gray-200 text-gray-700">
+              <tr className="border-b border-gray-300">
+                <th className="font-semibold px-3 py-2">Image ID</th>
+                <th className="font-semibold px-3 py-2">Predictions</th>
+                <th className="font-semibold px-3 py-2">Confidence</th>
+                <th className="font-semibold px-3 py-2">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {predictions.map((result) => (
+                <tr key={result.image_id} className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="px-3 py-2">{result.image_id}</td>
+                  <td className="px-3 py-2">{result.prediction}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
+                        <div 
+                          className="bg-teal-500 h-2.5 rounded-full" 
+                          style={{ width: `${result.confidence * 100}%` }}
+                        ></div>
+                      </div>
+                      <span>{(result.confidence * 100).toFixed(0)}%</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">{new Date(result.created_at).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No results found. Upload an image to see analysis results.
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

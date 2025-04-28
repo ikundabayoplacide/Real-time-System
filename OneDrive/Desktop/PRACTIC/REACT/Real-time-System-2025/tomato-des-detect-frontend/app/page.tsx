@@ -22,7 +22,7 @@ export default function Home() {
               to protect your crop and boost yields
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/src/dashboard">
+            <Link href="/dashboard">
               <Button className="bg-red-500 hover:bg-red-600 text-white">
                 Get Started
               </Button>

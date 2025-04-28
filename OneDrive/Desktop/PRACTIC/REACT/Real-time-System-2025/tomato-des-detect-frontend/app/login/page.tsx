@@ -36,8 +36,7 @@ export default function LoginPage() {
     try{
       const result=await loginUser(loginData);
       console.log("Login response:", result);
-        alert("Login successful, Welcome back!");
-        window.location.href="/src/dashboard";
+        window.location.href="/dashboard";
       
     }
     catch(error){
@@ -125,7 +124,7 @@ export default function LoginPage() {
             </span>
           </div>
         </div>
-          <a variant="outline" className="w-full flex justify-center text-lg text-blue-500" disabled={isLoading} href="/src/auth/signup">
+          <a variant="outline" className="w-full flex justify-center text-lg text-blue-500" disabled={isLoading} href="/signup">
             Signup here 
             <ArrowRight className="ml-1 mt-1" size={23} />
      </a>

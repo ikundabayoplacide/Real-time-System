@@ -48,7 +48,7 @@ export default function SignupPage() {
       const result=await(registerUser(registerData));
       console.log("Signup response:", result);
       alert("signing up successfull");
-      router.push("/src/auth/login");
+      router.push("/login");
         }
         catch(error){
           setIsLoading(false);
@@ -180,7 +180,7 @@ export default function SignupPage() {
           </div>
         </div>
 
-       <a className="text-blue-500 text-xl text-center flex justify-center" href="/src/auth/login"> Signin here  <ArrowRight className="mt-1" size={23}/></a> 
+       <a className="text-blue-500 text-xl text-center flex justify-center" href="/login"> Signin here  <ArrowRight className="mt-1" size={23}/></a> 
       </div>
     </div>
     </>
